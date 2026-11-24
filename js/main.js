@@ -76,17 +76,35 @@ $$('video').forEach((v) => vio.observe(v));
 })();
 
 /* ---------------- Visual layers ---------------- */
-let sky = null, dust = null, globe = null;
+let sky = null, dust = null;
+// The globe (Three.js + map data, ~300 KB) loads only when its section is near.
+// Until then this stand-in remembers settings and answers safely.
+const globe = {
+  real: null, cfg: { offset: .12, spin: false, p: 0 },
+  setOffset(o) { this.cfg.offset = o; this.real && this.real.setOffset(o); },
+  setSpin(s) { this.cfg.spin = s; this.real && this.real.setSpin(s); },
+  setProgress(p) { this.cfg.p = p; this.real && this.real.setProgress(p); },
+  screenSphere() { return this.real ? this.real.screenSphere() : null; },
+  renderOnce() { this.real && this.real.renderOnce(); }
+};
+const loadGlobe = () => import('./globe.js').then((m) => {
+  try {
+    const g = m.createGlobe($('.globe')); if (!g) return;
+    g.setOffset(globe.cfg.offset); g.setSpin(globe.cfg.spin); g.setProgress(reduce ? 1 : globe.cfg.p);
+    globe.real = g; g.renderOnce();
+  } catch (e) {}
+}).catch(() => {});
+const gio = new IntersectionObserver(([e]) => { if (e.isIntersecting) { gio.disconnect(); loadGlobe(); } }, { rootMargin: '150% 0px' });
+gio.observe($('.region'));
 const skyCanvas = $('.sky__c');
 const ready = Promise.all([
-  reduce ? null : import('./sky.js').then((m) => { try { sky = m.createSky(skyCanvas); } catch (e) {} }).catch(() => {}),
-  reduce ? null : import('./dust.js').then((m) => { dust = m.createDust($('.dust')); }).catch(() => {}),
-  import('./globe.js').then((m) => { try { globe = m.createGlobe($('.globe')); } catch (e) {} }).catch(() => {})
+  // paint the poster first, then compile the (heavy) live sky shader on the next frames
+  reduce ? null : import('./sky.js').then((m) => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(() => { try { sky = m.createSky(skyCanvas); } catch (e) {} res(); })))).catch(() => {}),
+  reduce ? null : import('./dust.js').then((m) => { dust = m.createDust($('.dust')); }).catch(() => {})
 ]);
 
 if (reduce) {
-  // Calm mode: final states, globe settled on Shillong.
-  ready.then(() => { if (globe) { globe.setProgress(1); globe.renderOnce(); } });
+  // Calm mode: final states; the globe settles on Shillong when it loads.
   $$('.towns li').forEach((li) => li.classList.add('on'));
   $('.hint').classList.add('is-off');
 } else {

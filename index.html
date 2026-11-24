@@ -8,6 +8,10 @@
   <meta name="theme-color" content="#e8e7e5">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preload" href="assets/sky-poster.webp" as="image" fetchpriority="high">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script>
@@ -15,13 +19,13 @@
     if (matchMedia('(pointer: coarse)').matches) document.documentElement.classList.add('touch');
     try { if (localStorage.getItem('motion') === 'off') document.documentElement.classList.add('reduced'); } catch (e) {}
   </script>
-  <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+  <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.min.js" } }</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
   <!-- Fixed visual layers -->
-  <div class="sky" aria-hidden="true"><canvas class="sky__c"></canvas><img class="sky__poster" src="assets/sky-poster.jpg" alt=""></div>
+  <div class="sky" aria-hidden="true"><canvas class="sky__c"></canvas><img class="sky__poster" src="assets/sky-poster.webp" alt="" fetchpriority="high"></div>
   <canvas class="dust" aria-hidden="true"></canvas>
 
   <!-- Header -->
@@ -66,7 +70,7 @@
     <!-- INTRO VIDEO + CTA -->
     <section class="intro" id="path">
       <figure class="intro__card vcard" data-reveal-card>
-        <video class="vcard__v" src="assets/video/aerial.mp4" poster="assets/video/aerial.jpg" muted loop playsinline preload="metadata" aria-label="Slow aerial drift over misty pine ridges of the Khasi Hills (rendered)"></video>
+        <video class="vcard__v" src="assets/video/aerial.mp4" poster="assets/video/aerial.webp" muted loop playsinline preload="none" aria-label="Slow aerial drift over misty pine ridges of the Khasi Hills (rendered)"></video>
         <button class="sound-pill" type="button" data-sound><span class="sound-pill__ico" aria-hidden="true"><i></i><i></i><i></i></span><span class="sound-pill__t">Enable Sound</span></button>
       </figure>
       <a class="glass-cta" href="#book" data-magnetic>
@@ -212,10 +216,10 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script defer src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -110,7 +110,9 @@ export function createSky(canvas) {
       gl.uniform1i(uPhoto, 0);
       photo.tex = tex; photo.w = img.naturalWidth; photo.h = img.naturalHeight; photo.t0 = performance.now();
     };
-    img.src = 'assets/img/peaks.webp';
+    // pick the smallest photo that stays sharp on this screen
+    const need = Math.max(innerWidth, innerHeight * 1.5) * Math.min(devicePixelRatio || 1, 2);
+    img.src = need > 2100 ? 'assets/img/peaks-2560.webp' : 'assets/img/peaks-1920.webp';
   })();
   const fit = () => {
     const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight), ia = photo.w / photo.h, cl = (v, a, b) => Math.min(b, Math.max(a, v));
