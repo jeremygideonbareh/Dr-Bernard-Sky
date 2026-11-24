@@ -1,8 +1,9 @@
-// Live sky for the hero: drifting volumetric-looking clouds over a misty ridge (Khasi Hills / Shillong Peak mood).
+// Live sky for the hero: drifting volumetric-looking clouds over a high-resolution photo of misty peaks.
 // Raw WebGL (no library) so it costs nothing extra to load. Rendered at reduced resolution and paused when hidden.
 const FRAG = `
 precision highp float;
 uniform vec2 uRes; uniform float uT; uniform vec2 uM; uniform float uWhite;
+uniform sampler2D uPhoto; uniform float uHas; uniform vec4 uFit;
 float h31(vec3 p){p=fract(p*0.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
  return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
@@ -27,7 +28,9 @@ void main(){
   float l1 = cloud(q1 + vec2(-.06,.10), t*.012, .30);
   vec3 cc1 = mix(vec3(.74,.78,.82), vec3(1.), clamp(c1-l1*.55+.55,0.,1.));
   vec3 col = mix(sky, cc1, c1*.96);
-  // peaks rising through the clouds, bottom right (Shillong Peak ridge, stylised): sharp summits, rocky faces, snow streaks
+  vec3 colSky = col;
+  if (uHas < .999) {
+  // fallback until the photo loads: stylised summits, rocky faces, snow streaks
   float x = uv.x + uM.x*.006;
   float pk1 = .43 - abs(x-.60)*1.25;   // main summit
   float pk2 = .37 - abs(x-.86)*1.05;   // second summit
@@ -52,6 +55,20 @@ void main(){
   rock = mix(rock, vec3(.95,.96,.97), clamp(snow,0.,1.)*.62);
   rock = mix(rock, vec3(.88,.91,.93), smoothstep(ridge-.14, ridge-.32, uv.y)); // base dissolves into haze
   col = mix(col, rock, mR);
+  }
+  if (uHas > .001) {
+    // High-resolution photo of misty peaks (cover-fit, mirrored so the summits sit right of the headline)
+    vec2 iu = vec2(uFit.z + uv.x*uFit.x, uFit.w + uv.y*uFit.y) + uM*vec2(.004,.003);
+    iu.x = 1. - iu.x;
+    vec3 ph = texture2D(uPhoto, iu).rgb;
+    float lum = dot(ph, vec3(.299,.587,.114));
+    ph *= vec3(.95,.985,1.03);                                   // cool it into the site palette
+    float skyMask = smoothstep(.62,.88,lum) * smoothstep(.42,.9,uv.y);
+    vec3 base = mix(ph, sky, skyMask*.92);                      // the photo's pale sky takes on the blue
+    float bright = smoothstep(.45,.85,lum);
+    vec3 colP = mix(base, cc1, c1*.96*mix(.22, 1., bright));   // same high clouds: over sky/snow, thin over rock
+    col = mix(col, colP, uHas);
+  }
   // low fog layer drifting faster, in front of the ridge foot
   vec2 q2 = p*vec2(1.6,3.2) + vec2(t*.022, 0.) + uM*.06;
   float c2 = cloud(q2, t*.02+4., .34) * smoothstep(.36,.08,uv.y);
@@ -77,12 +94,36 @@ export function createSky(canvas) {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const U = (n) => gl.getUniformLocation(prog, n);
-  const uRes = U('uRes'), uT = U('uT'), uM = U('uM'), uWhite = U('uWhite');
+  const uRes = U('uRes'), uT = U('uT'), uM = U('uM'), uWhite = U('uWhite'), uPhoto = U('uPhoto'), uHas = U('uHas'), uFit = U('uFit');
+  // background photo (loaded async; the procedural ridge shows until it arrives, then cross-fades)
+  const photo = { tex: null, w: 1, h: 1, has: 0 };
+  (() => {
+    const img = new Image(); img.decoding = 'async';
+    img.onload = () => {
+      const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.uniform1i(uPhoto, 0);
+      photo.tex = tex; photo.w = img.naturalWidth; photo.h = img.naturalHeight; photo.t0 = performance.now();
+    };
+    img.src = 'assets/img/peaks.webp';
+  })();
+  const fit = () => {
+    const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight), ia = photo.w / photo.h, cl = (v, a, b) => Math.min(b, Math.max(a, v));
+    let kx, ky, ox, oy;
+    if (asp >= ia) { const z = .8; kx = z; ky = z * ia / asp; ox = 0; oy = cl(.64 - .6 * ky, 0, 1 - ky); }
+    else { const z = 1; ky = z; kx = z * asp / ia; ox = cl(.62 - .55 * kx, 0, 1 - kx); oy = cl(.64 - .62 * ky, 0, 1 - ky); }
+    return [kx, ky, ox, oy];
+  };
 
   const coarse = matchMedia('(pointer: coarse)').matches;
   // Full native resolution on desktop (capped at 1.5x DPR); lowered automatically only if frames run slow
-  let scale = coarse ? .6 : Math.min(devicePixelRatio || 1, 1.5);
-  const minScale = coarse ? .45 : .6; let slow = 0, lastT = 0;
+  let scale = coarse ? Math.min(devicePixelRatio || 1, 2) : Math.min(devicePixelRatio || 1, 1.5);
+  const minScale = coarse ? .75 : .6; let slow = 0, lastT = 0;
   const state = { white: 0, mx: 0, my: 0, tx: 0, ty: 0, running: false, active: true, t0: performance.now(), raf: 0 };
   const resize = () => {
     const w = Math.max(2, Math.round(canvas.clientWidth * scale)), h = Math.max(2, Math.round(canvas.clientHeight * scale));
@@ -104,6 +145,8 @@ export function createSky(canvas) {
     gl.uniform1f(uT, (performance.now() - state.t0) / 1000 + 40);
     gl.uniform2f(uM, state.mx, -state.my);
     gl.uniform1f(uWhite, state.white);
+    if (photo.tex) { photo.has = Math.min(1, (performance.now() - photo.t0) / 1200); gl.uniform4fv(uFit, fit()); }
+    gl.uniform1f(uHas, photo.has);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   const toggle = () => {

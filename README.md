@@ -22,7 +22,7 @@ Then open http://localhost:5180. It's also published on GitHub Pages from `main`
 | Reference element | Replacement | How it was made |
 |---|---|---|
 | SkyClinics wordmark + triangle mark | **B.T. LYNGDOH** wordmark + three stacked rounded bars (vertebrae), the last in signboard red | Drawn as SVG by hand |
-| WebGL sky over Albanian peaks | Live WebGL clouds over a stylised Shillong-Peak ridge | `js/sky.js` fragment shader (fbm clouds, ridged summits, fog) |
+| WebGL sky over photographic peaks | Live WebGL clouds and fog over a high-resolution photo of misty peaks (mood image, not Shillong; Swiss Alps near Titlis) | `js/sky.js` shader composites the photo under the procedural cloud layers. Photo by delafthi, [Unsplash](https://unsplash.com/photos/a-snowy-mountain-with-clouds-oBuOT7fs2vU) (Unsplash License) |
 | Drone footage of the clinic | Aerial drift over misty pine ridges | WebGL render → H.264 (`sky/render`) |
 | Implantology footage | Spine model with a herniated (red) disc | Photo by Julius Toltesi, [Unsplash](https://unsplash.com/photos/close-up-of-a-human-spine-model-with-red-disc-5thrMBqG5E0) (Unsplash License) |
 | Full-arch footage | Two doctors reading brain MRI films | Photo by silverkblack, [Unsplash](https://unsplash.com/photos/two-doctors-examining-a-brain-mri-scan-together-AB0r9z7eRYg) (Unsplash License) |
