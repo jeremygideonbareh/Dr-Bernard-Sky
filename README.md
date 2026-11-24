@@ -24,17 +24,17 @@ Then open http://localhost:5180. It's also published on GitHub Pages from `main`
 | SkyClinics wordmark + triangle mark | **B.T. LYNGDOH** wordmark + three stacked rounded bars (vertebrae), the last in signboard red | Drawn as SVG by hand |
 | WebGL sky over Albanian peaks | Live WebGL clouds over a stylised Shillong-Peak ridge | `js/sky.js` fragment shader (fbm clouds, ridged summits, fog) |
 | Drone footage of the clinic | Aerial drift over misty pine ridges | WebGL render → H.264 (`sky/render`) |
-| Implantology footage | Rotating spinal column in clinical light | Three.js procedural vertebrae → H.264 |
-| Full-arch footage | MRI-style scan sweep over a rendered brain slice | Fragment shader → H.264 |
-| Smile-design footage | Nerve fibres carrying signal pulses | Fragment shader → H.264 |
-| Lab footage | Light through window blinds with drifting dust | Fragment shader → H.264 |
+| Implantology footage | Spine model with a herniated (red) disc | Photo by Julius Toltesi, [Unsplash](https://unsplash.com/photos/close-up-of-a-human-spine-model-with-red-disc-5thrMBqG5E0) (Unsplash License) |
+| Full-arch footage | Two doctors reading brain MRI films | Photo by silverkblack, [Unsplash](https://unsplash.com/photos/two-doctors-examining-a-brain-mri-scan-together-AB0r9z7eRYg) (Unsplash License) |
+| Smile-design footage | Man holding his head in discomfort (nerve / facial pain) | Photo by silverkblack, [Unsplash](https://unsplash.com/photos/elderly-man-holding-head-in-discomfort-on-couch-oyZfrQrVipY) (Unsplash License) |
+| Lab footage | Paediatric doctor examining a baby | Photo by CDC, [Unsplash](https://unsplash.com/photos/a-young-child-is-being-examined-by-a-doctor-fx9RJgZYRUE) (Unsplash License) |
 | Globe: 22 countries, flight times to Albania | Globe turning to North-East India; 12 towns, approximate road times to Shillong | Three.js + Natural Earth borders drawn to a canvas texture; arcs as quadratic Béziers |
 | Albania silhouette | India silhouette with a Shillong pin | Generated at runtime from the same Natural Earth data |
 | Music toggle | Ambient wind + soft pad | Web Audio, off until the visitor turns it on |
 | Cookie banner | Storage notice (only motion/sound choices are kept; no cookies, no tracking) | n/a |
 | Copy | Written for the clinic from public facts (see `../../clinic-research.md`) | n/a |
 
-All videos are 6-second, seamless loops: every motion is periodic in the loop time. Each was rendered at 30 fps by `sky/render/render.mjs` (headless Chromium + WebGL → JPEG frames → FFmpeg `libx264`, CRF 24, `+faststart`), with posters taken from frame 0. Blender wasn't available on this machine (its MCP add-on was outdated and not running), so WebGL was used as the render engine.
+Treatment cards use licensed stock photography (above, chosen to match each condition) with a slow drift-and-zoom. The intro aerial and the earlier rendered loops (`assets/video/`) are 6-second, seamless loops: every motion is periodic in the loop time. Each was rendered at 30 fps by `sky/render/render.mjs` (headless Chromium + WebGL → JPEG frames → FFmpeg `libx264`, CRF 24, `+faststart`), with posters taken from frame 0. Blender wasn't available on this machine (its MCP add-on was outdated and not running), so WebGL was used as the render engine.
 
 ## To confirm with the clinic
 - WhatsApp number and phone (shown as "to be confirmed")

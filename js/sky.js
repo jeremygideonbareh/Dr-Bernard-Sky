@@ -80,7 +80,9 @@ export function createSky(canvas) {
   const uRes = U('uRes'), uT = U('uT'), uM = U('uM'), uWhite = U('uWhite');
 
   const coarse = matchMedia('(pointer: coarse)').matches;
-  const scale = coarse ? .42 : .55; // render below native res; clouds are soft anyway
+  // Full native resolution on desktop (capped at 1.5x DPR); lowered automatically only if frames run slow
+  let scale = coarse ? .6 : Math.min(devicePixelRatio || 1, 1.5);
+  const minScale = coarse ? .45 : .6; let slow = 0, lastT = 0;
   const state = { white: 0, mx: 0, my: 0, tx: 0, ty: 0, running: false, active: true, t0: performance.now(), raf: 0 };
   const resize = () => {
     const w = Math.max(2, Math.round(canvas.clientWidth * scale)), h = Math.max(2, Math.round(canvas.clientHeight * scale));
@@ -89,9 +91,11 @@ export function createSky(canvas) {
   const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
   const onMove = (e) => { state.tx = (e.clientX / innerWidth) * 2 - 1; state.ty = (e.clientY / innerHeight) * 2 - 1; };
   addEventListener('pointermove', onMove, { passive: true });
-  const frame = () => {
+  const frame = (now) => {
     if (!state.running) return;
     state.raf = requestAnimationFrame(frame);
+    if (lastT && now) { const dt = now - lastT; slow = dt > 28 ? slow + 1 : Math.max(0, slow - 1); if (slow > 45 && scale > minScale) { scale = Math.max(minScale, scale - .15); slow = 0; resize(); } }
+    lastT = now || 0;
     draw();
   };
   const draw = () => {

@@ -124,14 +124,14 @@ function initMotion() {
     .from(chars, { opacity: 0, y: 18, filter: 'blur(6px)', duration: 1.15, stagger: .045, ease: 'expo.out' }, '-=.8')
     .from(['.hero__sub', '.hero__tag'], { opacity: 0, y: 10, duration: .9, stagger: .12, ease: 'expo.out' }, '-=.7')
     .from('.hero__explore', { opacity: 0, y: 10, duration: .9, ease: 'expo.out' }, '-=.6')
-    .from('.hdr__nav > *', { opacity: 0, y: -10, duration: .8, stagger: .06, ease: 'expo.out' }, '-=.9')
+    .from('.hdr__nav > *', { opacity: 0, y: -10, duration: .8, stagger: .06, ease: 'expo.out', clearProps: 'opacity,transform' }, '-=.9')
     .from(['.hint', '.dock > *'], { opacity: 0, y: 12, duration: .8, stagger: .08, ease: 'expo.out', clearProps: 'opacity,transform' }, '-=.7');
   // hero block drifts up and fades as the sky whites out
   gsap.to('.hero__block', { yPercent: -35, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '80% top', scrub: true } });
 
   /* Video cards: open from a smaller inset, inner video settles */
   $$('[data-reveal-card]').forEach((card) => {
-    const v = $('video', card);
+    const v = $('.vcard__v', card);
     gsap.fromTo(card, { clipPath: 'inset(9% 9% 9% 9% round 3px)' }, { clipPath: 'inset(0% 0% 0% 0% round 3px)', ease: 'none', scrollTrigger: { trigger: card, start: 'top 95%', end: 'top 35%', scrub: .6 } });
     gsap.fromTo(v, { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
