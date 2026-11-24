@@ -115,7 +115,7 @@ export function createGlobe(canvas) {
     const k = ease(Math.min(1, S.p / .55));
     const turn = A.ry + (B.ry - A.ry) * k + S.auto;
     world.rotation.set(A.rx + (B.rx - A.rx) * k, turn, 0);
-    const z = 3.9 - .75 * ease(Math.min(1, Math.max(0, (S.p - .3) / .45)));
+    const z = 3.9 - .3 * ease(Math.min(1, Math.max(0, (S.p - .3) / .45)));
     camera.position.z = z; S.z = z;
     // keep the whole hemisphere in frame, placed right of centre on desktop
     world.position.x = S.offset * 2 * z * TAN * camera.aspect;
@@ -138,7 +138,7 @@ export function createGlobe(canvas) {
     // on-screen centre/radius of the sphere (CSS px, viewport coords) - used by the dust layer to gather into it
     screenSphere() {
       const r = canvas.getBoundingClientRect(); if (!r.height) return null;
-      const z = 3.9 - .75 * ease(Math.min(1, Math.max(0, (S.p - .3) / .45)));
+      const z = 3.9 - .3 * ease(Math.min(1, Math.max(0, (S.p - .3) / .45)));
       return { x: r.left + r.width / 2 + S.offset * r.width, y: r.top + r.height / 2, r: r.height / (2 * z * TAN), rot: world.rotation.y };
     },
     renderOnce: draw

@@ -125,7 +125,7 @@ function initMotion() {
     .from(['.hero__sub', '.hero__tag'], { opacity: 0, y: 10, duration: .9, stagger: .12, ease: 'expo.out' }, '-=.7')
     .from('.hero__explore', { opacity: 0, y: 10, duration: .9, ease: 'expo.out' }, '-=.6')
     .from('.hdr__nav > *', { opacity: 0, y: -10, duration: .8, stagger: .06, ease: 'expo.out' }, '-=.9')
-    .from(['.hint', '.dock > *'], { opacity: 0, y: 12, duration: .8, stagger: .08, ease: 'expo.out' }, '-=.7');
+    .from(['.hint', '.dock > *'], { opacity: 0, y: 12, duration: .8, stagger: .08, ease: 'expo.out', clearProps: 'opacity,transform' }, '-=.7');
   // hero block drifts up and fades as the sky whites out
   gsap.to('.hero__block', { yPercent: -35, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: '80% top', scrub: true } });
 
@@ -193,10 +193,11 @@ function initMotion() {
     addEventListener('resize', () => { townW = []; layoutTowns(); });
     gsap.fromTo('.region__head', { opacity: 0, y: 30 }, { opacity: 1, y: 0, ease: 'none', scrollTrigger: { trigger: '.region', start: 'top 70%', end: 'top top', scrub: true } });
     gsap.fromTo('.towns li', { opacity: 0 }, { opacity: 1, stagger: .04, ease: 'none', scrollTrigger: { trigger: '.region', start: 'top 10%', end: '20% top', scrub: true, onEnter: layoutTowns } });
-    return () => { root.classList.remove('curved-towns'); items.forEach((li) => (li.style.transform = '')); };
     gsap.fromTo('.formcard', { opacity: 0, xPercent: -14 }, { opacity: 1, xPercent: 0, ease: 'none', immediateRender: true, scrollTrigger: { trigger: '.region', start: '84% bottom', end: '97% bottom', scrub: true } });
-    // heading steps aside as the form arrives in the same place
+    // heading and town list step aside as the form arrives in the same place
     gsap.to('.region__head', { opacity: 0, y: 30, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.region', start: '78% bottom', end: '86% bottom', scrub: true } });
+    gsap.to('.towns', { opacity: 0, ease: 'none', immediateRender: false, scrollTrigger: { trigger: '.region', start: '80% bottom', end: '87% bottom', scrub: true } });
+    return () => { root.classList.remove('curved-towns'); items.forEach((li) => (li.style.transform = '')); };
   });
   mm.add('(max-width: 768px)', () => {
     globe && globe.setSpin(true); globe && globe.setOffset(0);
